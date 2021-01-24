@@ -14,14 +14,18 @@ def on_click(x, y, button, pressed):
         global bot_right
         bot_right = (x, y)
 
-    return pressed  # Stop the listener when pressed is False
+    return pressed  # Stop mouse_listener when pressed is False
 
 
-# Collect events until released
-with mouse.Listener(on_click=on_click) as listener:
-    listener.join()
+def tesselect():
+    # Collect events until released
+    with mouse.Listener(on_click=on_click) as mouse_listener:
+        mouse_listener.join()
 
-img = ImageGrab.grab(bbox=(top_left[0], top_left[0], bot_right[0], bot_right[0]))
-img = ImageOps.grayscale(img)
+    if top_left < bot_right:  # Compare x and y of top_left and bot_right
+        img = ImageOps.grayscale(ImageGrab.grab(bbox=(*top_left, *bot_right)))
+        pyperclip.copy(pytesseract.image_to_string(img).strip())
 
-pyperclip.copy(pytesseract.image_to_string(img).strip())
+
+with keyboard.GlobalHotKeys({"<ctrl>+<alt>+t": tesselect}) as keyboard_listener:
+    keyboard_listener.join()
